@@ -47,7 +47,7 @@
             makeCameraList() {
                 this.cameraSelectElement.innerHTML = '';
                 let defaultOption = document.createElement('option');
-                defaultOption.innerHTML = "---";
+                defaultOption.innerHTML = "Choose a camera";
                 defaultOption.value = "";
                 defaultOption.selected = true;
                 defaultOption.disabled = true;
@@ -119,6 +119,7 @@
     <div
         style="display: flex; flex-direction: column; justify-content: center; position: fixed; bottom: 0; left: 0; right: 0;">
         <select id="camera-select" name="camera-select">
+            <option value="" selected disabled hidden> Choose a camera </option>
             <!-- To be added -->
         </select>
         <button id="capture-btn">
