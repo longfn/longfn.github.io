@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Test webcam & Take photos</title>
+    <style>
+        html {
+            font-size: 100%;
+        }
+
+        #camera-select {
+            font-size: 1.6rem;
+        }
+
+        #capture-btn {
+            font-size: 1.6rem;
+        }
+    </style>
+    <script>
+        class Webcam {
+            constructor(cameraSelectElement, videoOutputElement, imageContainerElement) {
+                if (!this.hasGetUserMedia) {
+                    alert('Your browser is not supported');
+                } else {
+                    this.requestPermission();
+                }
+
+                this.cameraSelectElement = cameraSelectElement;
+                this.videoOutputElement = videoOutputElement;
+                this.imageContainerElement = imageContainerElement;
+            }
+
+            hasGetUserMedia() {
+                return !!(
+                    navigator.mediaDevices &&
+                    navigator.mediaDevices.getUserMedia
+                );
+            }
+
+            requestPermission() {
+                let constraints = { video: true };
+                navigator.mediaDevices.getUserMedia(constraints)
+                    .then(() => this.makeCameraList())
+                    .catch((err) => alert(err));
+            }
+
+            makeCameraList() {
+                this.cameraSelectElement.innerHTML = '';
+                let defaultOption = document.createElement('option');
+                defaultOption.innerHTML = "---";
+                defaultOption.value = "";
+                defaultOption.selected = true;
+                defaultOption.disabled = true;
+                defaultOption.hidden = true;
+                this.cameraSelectElement.appendChild(defaultOption);
+
+                let self = this;
+                navigator.mediaDevices.enumerateDevices()
+                    .then(function (deviceList) {
+                        let cameraList = deviceList.filter((device) => (device.kind == 'videoinput'));
+                        cameraList.forEach((camera) => {
+                            let optionElement = document.createElement('option');
+                            optionElement.value = camera.deviceId;
+                            optionElement.innerHTML = camera.label;
+                            self.cameraSelectElement.appendChild(optionElement);
+                        });
+
+                        self.cameraSelectElement.onchange = function () {
+                            let selectedCamera = self.cameraSelectElement.children[
+                                self.cameraSelectElement.selectedIndex
+                            ].value;
+                            self.showPreview(selectedCamera);
+                        };
+                    })
+                    .catch((err) => alert(err));
+            }
+
+            showPreview(cameraId) {
+                let constraints = {
+                    video: {
+                        deviceId: cameraId,
+                    }
+                };
+
+                let self = this;
+                navigator.mediaDevices.getUserMedia(constraints)
+                    .then(function (stream) {
+                        self.videoOutputElement.srcObject = stream;
+                        self.videoOutputElement.play();
+                    })
+                    .catch((err) => alert(err));
+            }
+
+            captureScreenshot() {
+                if (!this.videoOutputElement.srcObject) {
+                    return;
+                }
+
+                let canvas = document.createElement('canvas');
+                canvas.width = this.videoOutputElement.clientWidth;
+                canvas.height = this.videoOutputElement.clientHeight;
+                let context = canvas.getContext('2d');
+                context.drawImage(this.videoOutputElement, 0, 0);
+                let dataURL = canvas.toDataURL();
+
+                //create img
+                let img = document.createElement('img');
+                img.setAttribute('src', dataURL);
+
+                //append img in container div
+                this.imageContainerElement.appendChild(img);
+            }
+        }
+    </script>
+</head>
+
+<body>
+    <!-- Controller -->
+    <div
+        style="display: flex; flex-direction: column; justify-content: center; position: fixed; bottom: 0; left: 0; right: 0;">
+        <select id="camera-select" name="camera-select">
+            <!-- To be added -->
+        </select>
+        <button id="capture-btn">
+            Capture
+        </button>
+    </div>
+    <h1></h1>
+    <video id="webcam-output"></video>
+
+    <div id="image-container">
+        <p>
+            The images is displayed with HTML right away, not saved. Make sure to download them before leaving.
+        </p>
+    </div>
+
+
+    <script>
+        let camSel = document.querySelector('#camera-select');
+        let output = document.querySelector('#webcam-output');
+        let imgCon = document.querySelector('#image-container');
+        let wb = new Webcam(camSel, output, imgCon);
+
+        document.querySelector('#capture-btn').onclick = () => wb.captureScreenshot();
+    </script>
+</body>
+
+</html>
