@@ -13,30 +13,22 @@
             box-sizing: border-box;
         }
 
-        *:fullscreen,
-        *:-ms-fullscreen,
-        *:-webkit-full-screen,
-        *:-moz-full-screen {
-            overflow: auto !important;
-        }
-
         html {
             font-size: 100%;
+            height: 100%;
+            width: 100%;
         }
 
         body {
             height: 100%;
             width: 100%;
         }
-
+        
         #webcam-output {
-            position: absolute;
             width: auto;
             height: auto;
-            top: 50%;
-            left: 50%;
-            transform: translateX(-50%) translateY(-50%);
         }
+        
         @media (min-height: 100vw) {
             #webcam-output {
                 max-height: 100%;
@@ -63,6 +55,11 @@
             max-width: 100%;
             height: 4.8rem;
             padding: 1.6rem 0;
+            font-size: 1.6rem;
+        }
+
+        .reminder {
+            background-color: white;
             font-size: 1.6rem;
         }
     </style>
@@ -147,16 +144,17 @@
                 }
 
                 let canvas = document.createElement('canvas');
-                canvas.width = this.videoOutputElement.clientWidth;
-                canvas.height = this.videoOutputElement.clientHeight;
+                canvas.width = this.videoOutputElement.videoWidth;
+                canvas.height = this.videoOutputElement.videoHeight;
                 let context = canvas.getContext('2d');
                 context.drawImage(this.videoOutputElement, 0, 0);
                 let dataURL = canvas.toDataURL();
 
+                let div = document.createElement('div');
                 let img = document.createElement('img');
                 img.setAttribute('src', dataURL);
-
-                this.imageContainerElement.appendChild(img);
+                div.appendChild(img)
+                this.imageContainerElement.appendChild(div);
             }
         }
     </script>
@@ -173,16 +171,18 @@
         <button id="capture-btn">
             Capture
         </button>
-    </div>
-    <h1></h1>
-    <video id="webcam-output"></video>
-
-    <div id="image-container">
-        <p>
-            The images is displayed with HTML right away, not saved. Make sure to download them before leaving.
+        <p class="reminder">
+            The images is displayed with HTML right away (scroll down ↓), not saved. Make sure to download them before leaving.
         </p>
     </div>
 
+    <!-- Live preview -->
+    <video id="webcam-output"></video>
+    <hr>
+
+    <!-- Images -->
+    <div id="image-container">
+    </div>
 
     <script>
         let camSel = document.querySelector('#camera-select');
