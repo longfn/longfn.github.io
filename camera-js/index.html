@@ -2,6 +2,9 @@
 <html>
 
 <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Test webcam & Take photos</title>
     <style>
         * {
@@ -9,18 +12,56 @@
             padding: 0;
             box-sizing: border-box;
         }
+
+        *:fullscreen,
+        *:-ms-fullscreen,
+        *:-webkit-full-screen,
+        *:-moz-full-screen {
+            overflow: auto !important;
+        }
+
         html {
             font-size: 100%;
+        }
+
+        body {
             height: 100%;
             width: 100%;
         }
 
+        #webcam-output {
+            position: absolute;
+            width: auto;
+            height: auto;
+            top: 50%;
+            left: 50%;
+            transform: translateX(-50%) translateY(-50%);
+        }
+        @media (min-height: 100vw) {
+            #webcam-output {
+                max-height: 100%;
+                min-width: 100%;
+            }
+        }
+        @media (min-width: 100vh) {
+            #webcam-output {
+                min-height: 100%;
+                max-width: 100%;
+            }
+        }
+
         #camera-select {
+            min-width: 300px;
+            max-width: 100%;
+            height: 4.8rem;
             padding: 1.6rem 0;
             font-size: 1.6rem;
         }
 
         #capture-btn {
+            min-width: 300px;
+            max-width: 100%;
+            height: 4.8rem;
             padding: 1.6rem 0;
             font-size: 1.6rem;
         }
@@ -112,11 +153,9 @@
                 context.drawImage(this.videoOutputElement, 0, 0);
                 let dataURL = canvas.toDataURL();
 
-                //create img
                 let img = document.createElement('img');
                 img.setAttribute('src', dataURL);
 
-                //append img in container div
                 this.imageContainerElement.appendChild(img);
             }
         }
@@ -126,7 +165,7 @@
 <body>
     <!-- Controller -->
     <div
-        style="display: flex; flex-direction: column; justify-content: center; position: fixed; bottom: 0; left: 0; right: 0;">
+        style="display: flex; flex-direction: column; align-items: center; justify-content: center; position: fixed; bottom: 0; left: 0; right: 0; z-index: 999;">
         <select id="camera-select" name="camera-select">
             <option value="" selected disabled hidden> Choose a camera </option>
             <!-- To be added -->
